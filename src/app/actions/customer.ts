@@ -65,11 +65,12 @@ export async function updateCustomer(customerId: string, formData: FormData) {
   }
 }
 
-export async function toggleCustomerStatus(customerId: string, newStatus: string) {
+export async function toggleCustomerStatus(customerId: string, newStatus: string, reason?: string) {
   const session = await getServerSession(authOptions);
   if (!session) return { error: "Not authenticated" };
 
   const userRole = (session.user as any).role;
+  const userName = session.user?.name || "Staff";
   const tenantId = (session.user as any).tenantId;
 
   // Security: Only Admin can Restore (set to ACTIVE)
@@ -78,9 +79,21 @@ export async function toggleCustomerStatus(customerId: string, newStatus: string
   }
 
   try {
+    const updateData: any = { status: newStatus as any };
+    
+    if (newStatus === "INACTIVE" && reason) {
+        const customer = await prisma.customer.findUnique({ 
+            where: { id: customerId, tenantId },
+            select: { notes: true }
+        });
+        const date = new Date().toLocaleDateString();
+        const auditNote = `\n[Archived on ${date} by ${userName}: ${reason}]`;
+        updateData.notes = customer?.notes ? `${customer.notes}${auditNote}` : auditNote;
+    }
+
     await prisma.customer.update({
       where: { id: customerId, tenantId },
-      data: { status: newStatus as any },
+      data: updateData,
     });
     revalidatePath("/dashboard/customers");
     return { success: true };

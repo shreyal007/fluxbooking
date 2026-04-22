@@ -38,15 +38,42 @@ enum CustomerStatus {
   INACTIVE
 }
 
+enum SubscriptionPlan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum SubscriptionInterval {
+  MONTH
+  YEAR
+}
+
 model Tenant {
   id                String       @id @default(cuid())
   name              String
   slug              String       @unique
   businessType      BusinessType @default(SALON)
+  country           String       @default("US") // ISO Country Code (e.g., US, IN, GB)
+  currency          String       @default("USD") // Currency Code (e.g., USD, INR, GBP)
   logoUrl           String?
   businessHoursJson Json?        // Global opening/closing hours
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
+
+  // Subscription & Billing
+  plan                SubscriptionPlan     @default(FREE)
+  planInterval        SubscriptionInterval @default(MONTH)
+  planStatus          String?              @default("TRIALING") // ACTIVE, TRIALING, PAST_DUE, CANCELED
+  stripeCustomerId    String?              @unique
+  stripeSubscriptionId String?             @unique
+  trialEndsAt         DateTime?
+  subscriptionEndsAt  DateTime?
+
+  // Notifications & Credits
+  smsCredits               Int     @default(0)
+  emailNotificationsEnabled Boolean @default(true)
+  smsNotificationsEnabled   Boolean @default(false)
 
   users         User[]
   services      Service[]

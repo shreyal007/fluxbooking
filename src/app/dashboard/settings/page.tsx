@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { Settings as SettingsIcon, Building, Globe, Mail, Shield, Clock, Palette } from "lucide-react";
 import { AvailabilityEditor } from "@/components/dashboard/availability-editor";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
+import { BillingSettings } from "@/components/dashboard/billing-settings";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -15,12 +16,23 @@ export default async function SettingsPage() {
     where: { id: tenantId },
   });
 
+  const userRole = (session.user as any).role;
+
   return (
     <div className="space-y-8 max-w-4xl animate-fade-in">
       <div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h2>
         <p className="text-slate-500 dark:text-slate-400">Manage your business profile and preferences.</p>
       </div>
+
+      {/* Subscription Section - ONLY for ADMIN */}
+      {userRole === "ADMIN" && (
+        <BillingSettings 
+          currentPlan={tenant?.plan || "FREE"} 
+          planInterval={tenant?.planInterval || "MONTH"} 
+          smsCredits={tenant?.smsCredits || 0}
+        />
+      )}
 
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">

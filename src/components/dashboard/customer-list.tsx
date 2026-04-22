@@ -12,7 +12,9 @@ import {
   FileText,
   UserX,
   UserCheck,
-  RotateCcw
+  RotateCcw,
+  Archive,
+  AlertTriangle
 } from "lucide-react";
 import { updateCustomer, toggleCustomerStatus } from "@/app/actions/customer";
 import { format } from "date-fns";
@@ -23,6 +25,8 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
   // Admin starts with ACTIVE filter, Staff is locked to ACTIVE
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ACTIVE");
   const [editingCustomer, setEditingCustomer] = useState<any>(null);
+  const [archivingCustomer, setArchivingCustomer] = useState<any>(null);
+  const [archiveReason, setArchiveReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -60,17 +64,28 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
     setLoading(false);
   };
 
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
+  const handleToggleStatus = async (id: string, currentStatus: string, reason?: string) => {
       setProcessingId(id);
       const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-      const result = await toggleCustomerStatus(id, newStatus);
+      const result = await toggleCustomerStatus(id, newStatus, reason);
       
       if (result.success) {
           setCustomers(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
+          setArchivingCustomer(null);
+          setArchiveReason("");
       } else {
           alert(result.error);
       }
       setProcessingId(null);
+  };
+
+  const handleArchiveRequest = (customer: any) => {
+    if (userRole === "ADMIN") {
+      // Admins skip the reason pop-up for speed, or you can force it for them too
+      handleToggleStatus(customer.id, 'ACTIVE');
+    } else {
+      setArchivingCustomer(customer);
+    }
   };
 
   return (
@@ -171,12 +186,12 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
                       {/* Set INACTIVE Action: Both can do this for active clients */}
                       {customer.status === 'ACTIVE' ? (
                           <button 
-                            onClick={() => handleToggleStatus(customer.id, 'ACTIVE')}
+                            onClick={() => handleArchiveRequest(customer)}
                             disabled={processingId === customer.id}
-                            className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-100"
-                            title="Set Inactive"
+                            className="p-2 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-all shadow-sm border border-amber-100"
+                            title="Archive Customer"
                           >
-                            <UserX className="h-4 w-4" />
+                            <Archive className="h-4 w-4" />
                           </button>
                       ) : (
                         /* Set ACTIVE Action: ONLY Admin can restore inactive clients */
@@ -260,6 +275,65 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
                  </button>
               </form>
            </div>
+        </div>
+      )}
+
+      {/* Archive Confirmation Modal (Staff Only) */}
+      {archivingCustomer && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="p-8 text-center">
+              <div className="mx-auto h-16 w-16 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-6">
+                <AlertTriangle className="h-8 w-8 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Archive Customer?</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+                Warning: You are moving <span className="font-bold text-slate-900 dark:text-white">{archivingCustomer.name}</span> to the Archive. 
+                They will be hidden from your list. Only an Administrator can restore them.
+              </p>
+
+              <div className="space-y-4 text-left">
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Reason for Archiving</label>
+                <select 
+                  value={archiveReason}
+                  onChange={(e) => setArchiveReason(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-amber-500/20"
+                >
+                  <option value="">Select a reason...</option>
+                  <option value="Moved away">Moved away</option>
+                  <option value="Duplicate entry">Duplicate entry</option>
+                  <option value="Requested no contact">Requested no contact</option>
+                  <option value="Business decision">Business decision</option>
+                  <option value="Other">Other (Type below)</option>
+                </select>
+
+                {archiveReason === "Other" && (
+                   <input 
+                    type="text"
+                    placeholder="Please specify..."
+                    onChange={(e) => setArchiveReason(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 text-sm dark:text-white outline-none focus:ring-2 focus:ring-amber-500/20"
+                   />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-8">
+                <button 
+                  onClick={() => setArchivingCustomer(null)}
+                  className="py-4 rounded-2xl font-black text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => handleToggleStatus(archivingCustomer.id, 'ACTIVE', archiveReason)}
+                  disabled={!archiveReason || processingId === archivingCustomer.id}
+                  className="bg-amber-600 text-white py-4 rounded-2xl font-black hover:bg-amber-700 transition-all shadow-xl shadow-amber-100 dark:shadow-none disabled:opacity-50"
+                >
+                  {processingId === archivingCustomer.id ? "Archiving..." : "Confirm Archive"}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

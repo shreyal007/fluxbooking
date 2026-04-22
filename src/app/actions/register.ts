@@ -11,6 +11,8 @@ export async function registerBusiness(formData: FormData) {
   const businessName = formData.get("businessName") as string;
   const businessType = formData.get("businessType") as BusinessType;
   const slug = formData.get("slug") as string;
+  const country = (formData.get("country") as string) || "US";
+  const currency = (formData.get("currency") as string) || "USD";
 
   if (!name || !email || !password || !businessName || !slug) {
     return { error: "All fields are required" };
@@ -39,11 +41,18 @@ export async function registerBusiness(formData: FormData) {
 
     // Create Tenant and User in a transaction
     const result = await prisma.$transaction(async (tx) => {
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14); // Set trial for 14 days
+
       const tenant = await tx.tenant.create({
         data: {
           name: businessName,
           slug: slug.toLowerCase(),
           businessType,
+          country,
+          currency,
+          planStatus: "TRIALING",
+          trialEndsAt: trialEndsAt,
         },
       });
 
