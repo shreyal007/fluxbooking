@@ -44,7 +44,26 @@ export function BookingForm({
   const [slots, setSlots] = useState<{ time: string; staffId: string; staffName: string }[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
+
+  const clearFieldError = (field: string) => {
+    if (fieldErrors[field]) {
+      const newErrors = { ...fieldErrors };
+      delete newErrors[field];
+      setFieldErrors(newErrors);
+    }
+  };
+
+  const InputError = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 text-rose-500 animate-in fade-in slide-in-from-top-1 duration-200">
+        <AlertCircle className="h-3 w-3" />
+        <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+      </div>
+    );
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -86,7 +105,22 @@ export function BookingForm({
     if (!selectedService || !selectedSlot) return;
 
     setSubmitting(true);
+    setFieldErrors({});
+
     const formData = new FormData(event.currentTarget);
+    const customerName = formData.get("customerName") as string;
+    const customerEmail = formData.get("customerEmail") as string;
+
+    const errors: Record<string, string> = {};
+    if (!customerName) errors.customerName = "Full name is required";
+    if (!customerEmail) errors.customerEmail = "Email address is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setSubmitting(false);
+      return;
+    }
+
     formData.append("tenantId", tenantId);
     formData.append("serviceId", selectedService.id);
     formData.append("staffId", selectedSlot.staffId);
@@ -98,6 +132,8 @@ export function BookingForm({
 
     if (result.success) {
       setSuccess(true);
+    } else {
+      alert(result.error);
     }
   };
 
@@ -306,7 +342,7 @@ export function BookingForm({
                </div>
             </div>
 
-            <form onSubmit={handleConfirm} className="space-y-5">
+            <form onSubmit={handleConfirm} className="space-y-5" noValidate>
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2">Your Name</label>
@@ -314,9 +350,13 @@ export function BookingForm({
                     name="customerName"
                     type="text"
                     required
-                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-5 py-4 focus:bg-white focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-900"
+                    onChange={() => clearFieldError("customerName")}
+                    className={`w-full border-2 rounded-2xl px-5 py-4 focus:bg-white focus:border-indigo-600 focus:outline-none focus:ring-4 transition-all font-medium text-slate-900 ${
+                      fieldErrors.customerName ? "border-rose-100 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10" : "border-slate-50 bg-slate-50 focus:border-indigo-600 focus:ring-indigo-500/10"
+                    }`}
                     placeholder="Enter your full name"
                   />
+                  <InputError message={fieldErrors.customerName} />
                 </div>
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2">Email Address</label>
@@ -324,9 +364,13 @@ export function BookingForm({
                     name="customerEmail"
                     type="email"
                     required
-                    className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-5 py-4 focus:bg-white focus:border-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-900"
+                    onChange={() => clearFieldError("customerEmail")}
+                    className={`w-full border-2 rounded-2xl px-5 py-4 focus:bg-white focus:border-indigo-600 focus:outline-none focus:ring-4 transition-all font-medium text-slate-900 ${
+                      fieldErrors.customerEmail ? "border-rose-100 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/10" : "border-slate-50 bg-slate-50 focus:border-indigo-600 focus:ring-indigo-500/10"
+                    }`}
                     placeholder="name@example.com"
                   />
+                  <InputError message={fieldErrors.customerEmail} />
                 </div>
               </div>
 

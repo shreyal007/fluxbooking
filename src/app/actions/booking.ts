@@ -35,10 +35,21 @@ export async function getAvailableSlots(
     ? { id: staffId, tenantId } 
     : { tenantId };
 
-  const [staffMembers, tenant] = await Promise.all([
-    prisma.staff.findMany({ where: staffQuery }),
+  const [staffMembersAll, tenant] = await Promise.all([
+    prisma.staff.findMany({ 
+      where: staffQuery,
+      orderBy: { createdAt: "asc" } // Get in order of creation
+    }),
     prisma.tenant.findUnique({ where: { id: tenantId } })
   ]);
+
+  // ENFORCE PLAN LIMITS
+  const limits = { FREE: 1, TEAM: 5, PRO: 1000 };
+  let currentLimit = limits[tenant?.plan as keyof typeof limits] || 1;
+  if (tenant?.planStatus === "TRIALING" && currentLimit < 5) currentLimit = 5;
+
+  // Only use staff within the allowed limit
+  const staffMembers = staffMembersAll.slice(0, currentLimit);
 
   const businessHours = tenant?.businessHoursJson 
     ? (typeof tenant.businessHoursJson === 'string' ? JSON.parse(tenant.businessHoursJson) : tenant.businessHoursJson)

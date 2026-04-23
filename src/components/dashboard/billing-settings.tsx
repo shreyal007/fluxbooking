@@ -20,13 +20,21 @@ export function BillingSettings({
   const handleUpgrade = async (planId: string) => {
     setLoading(planId);
     const plan = PLANS.find(p => p.id === planId);
-    if (!plan || !plan.price.variantId) {
-       alert("Plan configuration error");
+    if (!plan) {
+       alert("Plan not found");
        setLoading(null);
        return;
     }
 
-    const result = await createLemonSqueezyCheckout(plan.price.variantId, "SUBSCRIPTION");
+    const variantId = interval === "YEAR" ? plan.price.yearlyVariantId : plan.price.monthlyVariantId;
+
+    if (!variantId) {
+      alert("Plan configuration error: Variant ID missing for this interval");
+      setLoading(null);
+      return;
+    }
+
+    const result = await createLemonSqueezyCheckout(variantId, "SUBSCRIPTION");
 
     if (result.url) {
       window.location.href = result.url;

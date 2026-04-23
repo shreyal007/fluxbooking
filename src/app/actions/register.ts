@@ -2,7 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { BusinessType, UserRole } from "@prisma/client";
+import { BusinessType, UserRole, SubscriptionPlan, SubscriptionInterval } from "@prisma/client";
+import { COUNTRIES } from "@/config/countries";
 
 export async function registerBusiness(formData: FormData) {
   const name = formData.get("name") as string;
@@ -13,6 +14,15 @@ export async function registerBusiness(formData: FormData) {
   const slug = formData.get("slug") as string;
   const country = (formData.get("country") as string) || "US";
   const currency = (formData.get("currency") as string) || "USD";
+  
+  // New Plan Selection Fields
+  const selectedPlan = (formData.get("plan") as SubscriptionPlan) || "FREE";
+  const selectedInterval = (formData.get("interval") as SubscriptionInterval) || "MONTH";
+
+  // Combine phone with country code
+  const selectedCountryData = COUNTRIES.find(c => c.code === country);
+  const rawPhone = formData.get("phone") as string;
+  const fullPhone = selectedCountryData && rawPhone ? `+${selectedCountryData.phoneCode}${rawPhone}` : rawPhone;
 
   if (!name || !email || !password || !businessName || !slug) {
     return { error: "All fields are required" };
@@ -51,6 +61,8 @@ export async function registerBusiness(formData: FormData) {
           businessType,
           country,
           currency,
+          plan: selectedPlan,
+          planInterval: selectedInterval,
           planStatus: "TRIALING",
           trialEndsAt: trialEndsAt,
         },
@@ -61,6 +73,7 @@ export async function registerBusiness(formData: FormData) {
           name,
           email,
           password: hashedPassword,
+          phone: fullPhone || null,
           role: UserRole.ADMIN,
           tenantId: tenant.id,
         },

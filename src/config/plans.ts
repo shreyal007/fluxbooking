@@ -5,7 +5,8 @@ export const PLANS = [
     description: "Perfect for solopreneurs starting out.",
     price: {
       amount: 0,
-      variantId: "", 
+      monthlyVariantId: "",
+      yearlyVariantId: "",
       priceIds: {
         test: "",
         production: "",
@@ -24,9 +25,10 @@ export const PLANS = [
     description: "Ideal for growing stylists and small teams.",
     price: {
       amount: 6.99,
-      variantId: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER || "price_placeholder_growth_monthly", 
+      monthlyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER_MONTHLY || "price_placeholder_starter_monthly",
+      yearlyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER_YEARLY || "price_placeholder_starter_yearly",
       priceIds: {
-        test: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER || "price_placeholder_growth_monthly",
+        test: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER_MONTHLY || "price_placeholder_starter_monthly",
         production: "",
       },
     },
@@ -44,9 +46,10 @@ export const PLANS = [
     description: "The complete toolkit for full salons and gyms.",
     price: {
       amount: 14.99,
-      variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PRO || "price_placeholder_unlimited_monthly",
+      monthlyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_PRO_MONTHLY || "price_placeholder_pro_monthly",
+      yearlyVariantId: process.env.NEXT_PUBLIC_LS_VARIANT_PRO_YEARLY || "price_placeholder_pro_yearly",
       priceIds: {
-        test: process.env.NEXT_PUBLIC_LS_VARIANT_PRO || "price_placeholder_unlimited_monthly",
+        test: process.env.NEXT_PUBLIC_LS_VARIANT_PRO_MONTHLY || "price_placeholder_pro_monthly",
         production: "",
       },
     },

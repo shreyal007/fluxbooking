@@ -48,10 +48,10 @@ export async function POST(req: Request) {
         where: { id: tenantId },
         data: {
           stripeCustomerId: session.customer as string,
-          stripeSubscriptionId: subscription.id,
+          stripeSubscriptionId: (subscription as any).id,
           planStatus: "ACTIVE",
-          plan: "PRO", 
-          subscriptionEndsAt: new Date(subscription.current_period_end * 1000),
+          plan: "PRO", // Default for stripe legacy
+          subscriptionEndsAt: new Date((subscription as any).current_period_end * 1000),
         },
       });
     }

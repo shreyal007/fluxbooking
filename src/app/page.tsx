@@ -1,74 +1,37 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { 
   Calendar, 
   Shield, 
   Users, 
   Zap, 
-  ChevronRight, 
   Clock, 
-  Star,
   CheckCircle2,
   ArrowRight,
   Plus,
-  Settings,
-  Scissors
+  Scissors,
+  Star,
+  ChevronRight,
+  Settings
 } from "lucide-react";
 
 const Twitter = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
-  </svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
 );
 
 const Linkedin = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-    <rect width="4" height="12" x="2" y="9"/>
-    <circle cx="4" cy="4" r="2"/>
-  </svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
 );
 
 const Github = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-    <path d="M9 18c-4.51 2-5-2-7-2"/>
-  </svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
 );
 
 export default function Home() {
+  const [isYearly, setIsYearly] = useState(false);
+
   return (
     <div className="flex flex-col min-h-screen bg-white selection:bg-indigo-100 selection:text-indigo-900">
       {/* Sticky Glass Header */}
@@ -81,15 +44,9 @@ export default function Home() {
             <span className="font-bold text-xl tracking-tight text-slate-900">FluxBooking</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8">
-            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="#features">
-              Features
-            </Link>
-            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="#how-it-works">
-              How it Works
-            </Link>
-            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="/login">
-              Login
-            </Link>
+            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="#features">Features</Link>
+            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="#pricing">Pricing</Link>
+            <Link className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors" href="/login">Login</Link>
             <Link
               href="/register"
               className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-slate-800 transition-all hover:shadow-xl hover:shadow-slate-200"
@@ -108,283 +65,265 @@ export default function Home() {
           <div className="container px-4 mx-auto relative z-10 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mb-8">
               <span className="flex h-2 w-2 rounded-full bg-indigo-600 animate-pulse"></span>
-              <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">The Future of Booking is Here</span>
+              <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Flux = Continuous Flow & Change</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 max-w-4xl mx-auto leading-[1.1]">
-              The Universal Booking System for <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Every Business</span>
+              Keep Your Business in <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Constant Flux</span>
             </h1>
             
             <p className="mx-auto max-w-2xl text-slate-500 text-lg md:text-xl mb-10 leading-relaxed">
-              From salons to gyms, manage your staff, services, and bookings in one high-performance SaaS platform designed for growth.
+              The high-performance booking system built for movement. Scale your staff, services, and revenue with precision.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
               <Link
                 href="/register"
                 className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-2xl bg-indigo-600 px-10 text-base font-bold text-white shadow-2xl shadow-indigo-500/20 transition-all hover:bg-indigo-700 hover:scale-[1.02] active:scale-95"
               >
-                Start Free Trial <ArrowRight className="ml-2 h-5 w-5" />
+                Start 14-Day Free Trial <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
-                href="#"
+                href="#pricing"
                 className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-10 text-base font-bold text-slate-900 transition-all hover:bg-slate-50 hover:border-slate-300"
               >
-                Watch Demo
+                View Plans
               </Link>
             </div>
 
-            {/* Mock UI Showcase - Matches actual system built */}
-            <div className="relative max-w-5xl mx-auto px-4 sm:px-0 opacity-100">
+            {/* Mock UI Showcase - Regular Balanced Size */}
+            <div className="relative max-w-5xl mx-auto px-4">
               <div className="rounded-[2.5rem] border border-slate-200 bg-white p-3 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] overflow-hidden">
                 <div className="rounded-[2rem] border border-slate-100 bg-[#F8FAFC] flex flex-col overflow-hidden">
-                  {/* Mock Browser Header */}
-                  <div className="h-12 bg-white border-b border-slate-200 flex items-center px-6 justify-between text-left">
+                  <div className="h-12 bg-white border-b border-slate-200 flex items-center px-8 justify-between text-left">
                     <div className="flex gap-2">
-                      <div className="h-3 w-3 rounded-full bg-[#FF5F57] shadow-sm"></div>
-                      <div className="h-3 w-3 rounded-full bg-[#FEBC2E] shadow-sm"></div>
-                      <div className="h-3 w-3 rounded-full bg-[#28C840] shadow-sm"></div>
+                      <div className="h-3 w-3 rounded-full bg-[#FF5F57] border border-[#E0443E] shadow-sm"></div>
+                      <div className="h-3 w-3 rounded-full bg-[#FEBC2E] border border-[#D8A020] shadow-sm"></div>
+                      <div className="h-3 w-3 rounded-full bg-[#28C840] border border-[#1AAB2F] shadow-sm"></div>
                     </div>
-                    <div className="bg-slate-50 rounded-lg px-4 py-1.5 text-[10px] font-bold text-slate-400 font-mono tracking-tight flex items-center gap-2">
+                    <div className="bg-slate-50 rounded-lg px-6 py-2 text-[10px] font-bold text-slate-400 font-mono tracking-tight flex items-center gap-2">
                       <Shield className="h-3 w-3" />
                       fluxbooking.com/dashboard/appointments
                     </div>
                     <div className="w-12"></div>
                   </div>
 
-                  <div className="flex-1 flex overflow-hidden min-h-[500px] text-left">
-                    {/* Sidebar Mock - Matches internal Dashboard Shell */}
-                    <div className="w-52 bg-white border-r border-slate-200 p-5 space-y-6 hidden md:block">
+                  <div className="flex-1 flex overflow-hidden min-h-[450px] text-left">
+                    {/* Sidebar */}
+                    <div className="w-56 bg-white border-r border-slate-200 p-6 space-y-6 hidden md:block">
                        <div className="space-y-4">
-                         <div className="px-2"><p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Menu</p></div>
-                         <div className="h-10 w-full bg-slate-50 rounded-xl flex items-center px-3 gap-3">
-                            <Users className="h-4 w-4 text-slate-300" />
-                            <span className="text-xs font-bold text-slate-400">Team</span>
-                         </div>
-                         <div className="h-10 w-full bg-slate-50 rounded-xl flex items-center px-3 gap-3">
-                            <Scissors className="h-4 w-4 text-slate-300" />
-                            <span className="text-xs font-bold text-slate-400">Services</span>
-                         </div>
-                         <div className="h-10 w-full bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100 flex items-center px-3 gap-3">
-                            <Calendar className="h-4 w-4" />
+                         <div className="h-10 w-full bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100 flex items-center px-4 gap-3">
+                            <Calendar className="h-4.5 w-4.5" />
                             <span className="text-xs font-black">Appointments</span>
                          </div>
-                         <div className="h-10 w-full bg-slate-50 rounded-xl flex items-center px-3 gap-3">
-                            <Settings className="h-4 w-4 text-slate-300" />
-                            <span className="text-xs font-bold text-slate-400">Settings</span>
+                         <div className="h-10 w-full bg-slate-50 rounded-xl flex items-center px-4 gap-3">
+                            <Users className="h-4.5 w-4.5 text-slate-300" />
+                            <span className="text-xs font-bold text-slate-400">Team Members</span>
+                         </div>
+                         <div className="h-10 w-full bg-slate-50 rounded-xl flex items-center px-4 gap-3">
+                            <Scissors className="h-4.5 w-4.5 text-slate-300" />
+                            <span className="text-xs font-bold text-slate-400">Services</span>
                          </div>
                        </div>
                     </div>
 
-                    {/* Content Mock - Matches Appointments Table system */}
-                    <div className="flex-1 bg-white p-6 md:p-10 flex flex-col min-w-0">
-                       <div className="flex justify-between items-end mb-10">
-                         <div className="space-y-2">
-                            <h3 className="text-2xl font-black text-slate-900">Appointments</h3>
-                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Manage your schedule</p>
-                         </div>
-                         <button className="h-11 px-5 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-100 text-white text-xs font-black flex items-center gap-2 hover:scale-105 transition-transform">
-                            <Plus className="h-4 w-4" />
-                            New Booking
-                         </button>
+                    {/* Content */}
+                    <div className="flex-1 bg-white p-10">
+                       <div className="flex justify-between items-center mb-10">
+                          <h3 className="text-2xl font-black text-slate-900 tracking-tight">Daily Schedule</h3>
+                          <div className="h-11 px-5 bg-indigo-600 rounded-xl text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-100">
+                             <Plus className="h-4 w-4" /> New Booking
+                          </div>
                        </div>
-                       
-                       <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-                          <table className="w-full">
-                             <thead className="bg-slate-50 border-b border-slate-100 text-left">
-                                <tr>
-                                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date & Time</th>
-                                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hidden sm:table-cell">Customer</th>
-                                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Service</th>
-                                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                                </tr>
-                             </thead>
-                             <tbody className="divide-y divide-slate-50 text-left">
-                                {[
-                                  { date: "Oct 24, 2026", time: "10:30 AM", name: "Sarah Miller", service: "Hair Styling", status: "CONFIRMED", color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-                                  { date: "Oct 24, 2026", time: "01:00 PM", name: "Alex Jones", service: "Personal Training", status: "PENDING", color: "text-amber-600 bg-amber-50 border-amber-100" },
-                                  { date: "Oct 23, 2026", time: "04:15 PM", name: "David Wilson", service: "Full Body Spa", status: "COMPLETED", color: "text-indigo-600 bg-indigo-50 border-indigo-100" },
-                                  { date: "Oct 22, 2026", time: "09:00 AM", name: "Emma Thompson", service: "Manicure", status: "CONFIRMED", color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-                                ].map((row, i) => (
-                                  <tr key={i}>
-                                     <td className="px-6 py-4">
-                                        <p className="text-sm font-bold text-slate-900">{row.date}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase">{row.time}</p>
-                                     </td>
-                                     <td className="px-6 py-4 hidden sm:table-cell">
-                                        <p className="text-sm font-bold text-slate-900">{row.name}</p>
-                                        <p className="text-[9px] text-slate-400 font-medium">sarah.m@example.com</p>
-                                     </td>
-                                     <td className="px-6 py-4">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200">{row.service}</span>
-                                     </td>
-                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black border ${row.color}`}>{row.status}</span>
-                                     </td>
-                                  </tr>
-                                ))}
-                             </tbody>
-                          </table>
+                       <div className="space-y-4">
+                          {[
+                            { time: "09:00 AM", client: "Emma Wilson", service: "Hair Highlight", price: "$120", status: "CONFIRMED", color: "emerald" },
+                            { time: "11:30 AM", client: "Marcus Chen", service: "Men's Cut", price: "$45", status: "PENDING", color: "amber" },
+                            { time: "02:00 PM", client: "Sarah Smith", service: "Balayage", price: "$180", status: "COMPLETED", color: "indigo" }
+                          ].map((item, i) => (
+                            <div key={i} className="p-5 border border-slate-100 rounded-[1.5rem] flex items-center justify-between hover:border-indigo-100 transition-colors">
+                               <div className="flex items-center gap-5">
+                                  <div className="h-11 w-11 bg-slate-50 rounded-2xl flex items-center justify-center text-[10px] font-black text-slate-400">{item.time.split(' ')[0]}</div>
+                                  <div>
+                                     <p className="text-base font-black text-slate-900">{item.client}</p>
+                                     <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{item.service}</p>
+                                  </div>
+                               </div>
+                               <span className={`px-4 py-1.5 rounded-full text-[10px] font-black bg-${item.color}-50 text-${item.color}-600 border border-${item.color}-100`}>{item.status}</span>
+                            </div>
+                          ))}
                        </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              {/* Floating Accents */}
-              <div className="absolute -top-6 -right-6 h-32 w-32 bg-indigo-600/20 rounded-full blur-3xl"></div>
-              <div className="absolute -bottom-10 -left-10 h-40 w-40 bg-violet-600/20 rounded-full blur-3xl"></div>
             </div>
           </div>
         </section>
 
-        {/* Features Bento Grid */}
+        {/* Features Section */}
         <section id="features" className="py-24 bg-white relative overflow-hidden">
           <div className="container px-4 mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-sm font-bold text-indigo-600 uppercase tracking-widest mb-3">Powerfully Simple</h2>
-              <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Everything you need to scale</h3>
-              <p className="text-slate-500 text-lg max-w-2xl mx-auto">Built by industry experts to eliminate scheduling headaches and maximize your revenue.</p>
+              <h2 className="text-sm font-bold text-indigo-600 uppercase tracking-widest mb-3">The Platform</h2>
+              <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Engineered for Momentum</h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {/* Bento Card 1: Large Feature */}
-              <div className="md:col-span-2 lg:col-span-2 bg-slate-50 rounded-[2.5rem] p-10 border border-slate-100 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group overflow-hidden relative">
-                <div className="relative z-10">
-                  <div className="h-12 w-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 mb-6 group-hover:scale-110 transition-transform">
-                    <Zap className="h-6 w-6 text-white" />
-                  </div>
-                  <h4 className="text-2xl font-bold mb-3 text-slate-900">Instant Online Booking</h4>
-                  <p className="text-slate-500 leading-relaxed mb-6">Give your customers a premium booking experience on any device. 24/7 access means you never miss a lead.</p>
-                  <ul className="space-y-3">
-                    {["Customizable Booking URL", "Mobile-Optimized Flow", "Instant Notifications"].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                        <CheckCircle2 className="h-4 w-4 text-indigo-500" /> {item}
-                      </li>
-                    ))}
-                  </ul>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Card 1: Indigo */}
+              <div className="p-8 rounded-[2.5rem] border border-indigo-100/50 bg-indigo-50/50 shadow-sm hover:bg-white hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all group relative overflow-hidden">
+                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-md mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                  <Zap className="h-6 w-6" />
                 </div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-64 h-64 bg-indigo-200/20 rounded-full blur-3xl group-hover:bg-indigo-300/30 transition-colors"></div>
+                <h4 className="text-xl font-bold text-slate-900 mb-2">Instant Flow</h4>
+                <p className="text-slate-600 text-sm leading-relaxed font-medium">Optimized booking funnel that converts visitors into customers in seconds.</p>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-indigo-100/50 rounded-full blur-2xl group-hover:bg-indigo-200/50 transition-colors"></div>
               </div>
 
-              {/* Bento Card 2: Medium Feature */}
-              <div className="md:col-span-1 lg:col-span-2 bg-slate-900 rounded-[2.5rem] p-10 text-white hover:shadow-2xl hover:shadow-slate-500/10 transition-all group overflow-hidden relative">
-                <div className="relative z-10">
-                  <div className="h-12 w-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center mb-6">
-                    <Users className="h-6 w-6 text-indigo-400" />
-                  </div>
-                  <h4 className="text-2xl font-bold mb-3">Team Orchestration</h4>
-                  <p className="text-slate-400 leading-relaxed">Manage staff schedules, services, and class capacities with surgical precision.</p>
+              {/* Card 2: Emerald */}
+              <div className="p-8 rounded-[2.5rem] border border-emerald-100/50 bg-emerald-50/50 shadow-sm hover:bg-white hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all group relative overflow-hidden">
+                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-md mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                  <Shield className="h-6 w-6" />
                 </div>
-                {/* Visual Accent */}
-                <div className="absolute bottom-10 right-10 flex gap-1 items-end">
-                   <div className="w-3 h-8 bg-indigo-500 rounded-full"></div>
-                   <div className="w-3 h-14 bg-indigo-400 rounded-full"></div>
-                   <div className="w-3 h-10 bg-indigo-600 rounded-full"></div>
+                <h4 className="text-xl font-bold text-slate-900 mb-2">Deep Isolation</h4>
+                <p className="text-slate-600 text-sm leading-relaxed font-medium">Enterprise-grade multi-tenancy ensures your business data stays your own.</p>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-emerald-100/50 rounded-full blur-2xl group-hover:bg-emerald-200/50 transition-colors"></div>
+              </div>
+
+              {/* Card 3: Violet */}
+              <div className="p-8 rounded-[2.5rem] border border-violet-100/50 bg-violet-50/50 shadow-sm hover:bg-white hover:border-violet-200 hover:shadow-2xl hover:shadow-violet-500/10 transition-all group relative overflow-hidden">
+                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-violet-600 shadow-md mb-6 group-hover:bg-violet-600 group-hover:text-white transition-all">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h4 className="text-xl font-bold text-slate-900 mb-2">Team Scale</h4>
+                <p className="text-slate-600 text-sm leading-relaxed font-medium">Manage 1 to 100 staff members with zero scheduling overlaps.</p>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-violet-100/50 rounded-full blur-2xl group-hover:bg-violet-200/50 transition-colors"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="py-24 bg-slate-50 relative overflow-hidden">
+          <div className="container px-4 mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-sm font-bold text-indigo-600 uppercase tracking-widest mb-3">Simple Pricing</h2>
+              <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Pick your pace of flux</h3>
+              
+              <div className="mt-8 flex items-center justify-center gap-4">
+                <span className={`text-xs font-black transition-colors ${!isYearly ? 'text-slate-900' : 'text-slate-400'}`}>Monthly</span>
+                <button 
+                  onClick={() => setIsYearly(!isYearly)}
+                  className={`w-12 h-6 rounded-full p-1 transition-all duration-300 relative ${isYearly ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                >
+                  <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${isYearly ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </button>
+                <span className={`text-xs font-black transition-colors ${isYearly ? 'text-indigo-600' : 'text-slate-400'}`}>Yearly (-20%)</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+              {/* Free Plan */}
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col hover:scale-[1.02] transition-transform">
+                <h4 className="font-black text-slate-400 uppercase tracking-widest text-xs mb-4">Start-up</h4>
+                <div className="mb-6 flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-slate-900">$0</span>
+                  <span className="text-slate-400 text-sm">{isYearly ? '/yr' : '/mo'}</span>
+                </div>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {["1 Staff Member", "Unlimited Bookings", "Email Notifications", "Basic Calendar"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm font-semibold text-slate-600"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> {f}</li>
+                  ))}
+                </ul>
+                <div className="space-y-3">
+                  <Link href="/register" className="block w-full py-4 bg-slate-100 text-slate-600 rounded-2xl text-center font-black text-sm hover:bg-slate-200 transition-all">Start Free</Link>
+                  <p className="text-[10px] text-center font-bold text-slate-400 px-2 leading-tight">Includes 14-day trial of <span className="text-indigo-500">Starter features</span></p>
                 </div>
               </div>
 
-              {/* Bento Card 3: Small Feature */}
-              <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group">
-                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 mb-6 group-hover:rotate-12 transition-transform">
-                  <Clock className="h-6 w-6 text-indigo-600" />
+              {/* Starter Plan */}
+              <div className="bg-white p-8 rounded-[2.5rem] border-2 border-indigo-600 shadow-2xl shadow-indigo-100 flex flex-col relative scale-105 z-10">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">Popular</div>
+                <h4 className="text-3xl font-black text-slate-900 mb-2">Starter Plan</h4>
+                <div className="mb-10 flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-slate-900">${isYearly ? '69.90' : '6.99'}</span>
+                  <span className="text-slate-400 text-sm">{isYearly ? '/yr' : '/mo'}</span>
                 </div>
-                <h4 className="text-xl font-bold mb-2 text-slate-900">Real-time Slots</h4>
-                <p className="text-slate-500 text-sm">Automatic availability calculation prevents double bookings instantly.</p>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {["Up to 5 Staff Members", "Unlimited Bookings", "No Flux Branding", "Advanced Analytics"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm font-semibold text-slate-700"><CheckCircle2 className="h-4 w-4 text-indigo-500" /> {f}</li>
+                  ))}
+                </ul>
+                <Link href="/register" className="w-full py-4 bg-indigo-600 text-white rounded-2xl text-center font-black text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all">Start 14-Day Trial</Link>
               </div>
 
-              {/* Bento Card 4: Small Feature */}
-              <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all group">
-                <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 mb-6 group-hover:rotate-12 transition-transform">
-                  <Shield className="h-6 w-6 text-indigo-600" />
+              {/* Pro Plan */}
+              <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col hover:scale-[1.02] transition-transform">
+                <h4 className="text-3xl font-black text-slate-900 mb-2">Pro Plan</h4>
+                <div className="mb-10 flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-slate-900">${isYearly ? '149.90' : '14.99'}</span>
+                  <span className="text-slate-400 text-sm">{isYearly ? '/yr' : '/mo'}</span>
                 </div>
-                <h4 className="text-xl font-bold mb-2 text-slate-900">Enterprise Security</h4>
-                <p className="text-slate-500 text-sm">Data isolation and encryption to keep your business data private.</p>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {["Unlimited Staff", "Unlimited Bookings", "Multiple Locations", "Priority Support"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm font-bold text-slate-600"><CheckCircle2 className="h-4 w-4 text-indigo-500" /> {f}</li>
+                  ))}
+                </ul>
+                <Link href="/register" className="w-full py-4 bg-slate-900 text-white rounded-2xl text-center font-black text-sm hover:bg-slate-800 transition-all">Start 14-Day Trial</Link>
               </div>
+            </div>
 
-              {/* Bento Card 5: Horizontal Medium Feature */}
-              <div className="md:col-span-2 bg-indigo-50 rounded-[2.5rem] p-10 border border-indigo-100 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all flex flex-col md:flex-row items-center gap-8 group">
-                <div className="flex-1 text-center md:text-left">
-                  <h4 className="text-2xl font-bold mb-3 text-slate-900 tracking-tight">Growing with you</h4>
-                  <p className="text-slate-600 font-medium leading-relaxed">From a single specialist to 50+ staff members, FluxBooking scales effortlessly as your business grows.</p>
-                </div>
-                <div className="flex flex-col items-center md:items-end gap-3">
-                  <div className="flex -space-x-4">
-                    {[
-                      { name: "JD", bg: "bg-indigo-500" },
-                      { name: "AS", bg: "bg-violet-500" },
-                      { name: "MK", bg: "bg-blue-500" },
-                      { name: "TL", bg: "bg-emerald-500" },
-                    ].map((user, i) => (
-                      <div 
-                        key={i} 
-                        className={`h-12 w-12 rounded-full border-4 border-white ${user.bg} flex items-center justify-center text-[10px] font-black text-white shadow-lg shadow-slate-200 transition-transform group-hover:translate-x-1`}
-                        style={{ transitionDelay: `${i * 50}ms` }}
-                      >
-                        {user.name}
-                      </div>
-                    ))}
-                    <div className="h-12 w-12 rounded-full border-4 border-white bg-white flex items-center justify-center text-[10px] font-black text-slate-400 shadow-lg shadow-slate-200">
-                      +1k
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    <span className="text-sm font-black text-indigo-600 uppercase tracking-tighter">+500 Active Users</span>
-                  </div>
-                </div>
+            {/* SMS Top-ups */}
+            <div className="mt-16 text-center">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Enterprise Messaging</p>
+              <div className="flex flex-wrap justify-center gap-4">
+                 {["200 SMS - $12", "1000 SMS - $45", "2500 SMS - $99"].map((p) => (
+                   <div key={p} className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-black text-slate-900 shadow-sm transition-all hover:border-indigo-300">{p}</div>
+                 ))}
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-slate-50 border-t border-slate-200 py-16">
+      {/* Modern Dark Footer */}
+      <footer className="bg-slate-950 text-white py-16">
         <div className="container px-4 mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-1 md:col-span-2 space-y-6">
-              <Link href="/" className="flex items-center gap-2 group">
+              <Link href="/" className="flex items-center gap-2">
                 <div className="bg-indigo-600 p-1.5 rounded-lg">
                   <Calendar className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-bold text-xl tracking-tight text-slate-900">FluxBooking</span>
+                <span className="font-bold text-xl tracking-tight">FluxBooking</span>
               </Link>
-              <p className="text-slate-500 max-w-sm">The world's most versatile booking platform for growing businesses. Start managing your time better today.</p>
+              <p className="text-slate-400 text-sm max-w-sm">The world's most versatile booking platform for growing businesses.</p>
+              <div className="flex gap-4">
+                 <Link href="#" className="text-slate-600 hover:text-white transition-colors"><Twitter className="h-4 w-4" /></Link>
+                 <Link href="#" className="text-slate-600 hover:text-white transition-colors"><Linkedin className="h-4 w-4" /></Link>
+                 <Link href="#" className="text-slate-600 hover:text-white transition-colors"><Github className="h-4 w-4" /></Link>
+              </div>
             </div>
             <div>
-              <h5 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Platform</h5>
-              <ul className="space-y-4 text-sm font-medium text-slate-500">
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Features</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Pricing</Link></li>
-                <li><Link href="/register" className="hover:text-indigo-600 transition-colors">Register</Link></li>
+              <h5 className="font-bold mb-6 uppercase text-[10px] tracking-widest">Platform</h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-400">
+                <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+                <li><Link href="/register" className="hover:text-white transition-colors">Register</Link></li>
               </ul>
             </div>
             <div>
-              <h5 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Support</h5>
-              <ul className="space-y-4 text-sm font-medium text-slate-500">
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Documentation</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Contact</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</Link></li>
+              <h5 className="font-bold mb-6 uppercase text-[10px] tracking-widest">Support</h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-400">
+                <li><Link href="#" className="hover:text-white transition-colors">Documentation</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-slate-200">
-            <p className="text-xs text-slate-400 font-medium" suppressHydrationWarning>© 2026 FluxBooking SaaS. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-               <Link href="#" className="text-slate-400 hover:text-indigo-600 transition-colors">
-                 <Twitter className="h-4 w-4" />
-               </Link>
-               <Link href="#" className="text-slate-400 hover:text-indigo-600 transition-colors">
-                 <Linkedin className="h-4 w-4" />
-               </Link>
-               <Link href="#" className="text-slate-400 hover:text-indigo-600 transition-colors">
-                 <Github className="h-4 w-4" />
-               </Link>
-            </div>
+          <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase" suppressHydrationWarning>© 2026 FluxBooking SaaS. All rights reserved.</p>
+            <p className="text-[9px] text-slate-700 font-black tracking-widest uppercase">Built for constant motion.</p>
           </div>
         </div>
       </footer>

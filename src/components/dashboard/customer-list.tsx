@@ -14,7 +14,8 @@ import {
   UserCheck,
   RotateCcw,
   Archive,
-  AlertTriangle
+  AlertTriangle,
+  AlertCircle
 } from "lucide-react";
 import { updateCustomer, toggleCustomerStatus } from "@/app/actions/customer";
 import { format } from "date-fns";
@@ -25,6 +26,7 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
   // Admin starts with ACTIVE filter, Staff is locked to ACTIVE
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ACTIVE");
   const [editingCustomer, setEditingCustomer] = useState<any>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [archivingCustomer, setArchivingCustomer] = useState<any>(null);
   const [archiveReason, setArchiveReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,10 +45,33 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
     return matchesSearch && c.status === statusFilter;
   });
 
+  const clearFieldError = (field: string) => {
+    if (fieldErrors[field]) {
+      const newErrors = { ...fieldErrors };
+      delete newErrors[field];
+      setFieldErrors(newErrors);
+    }
+  };
+
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
+
     const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+
+    const errors: Record<string, string> = {};
+    if (!name) errors.name = "Customer name is required";
+    if (!email) errors.email = "Email is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
+
     const result = await updateCustomer(editingCustomer.id, formData);
     
     if (result.success) {
@@ -59,9 +84,23 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
       } : c));
       setEditingCustomer(null);
     } else {
-      alert(result.error);
+      if (result.error?.includes("email")) {
+        setFieldErrors({ email: "This email is already in use" });
+      } else {
+        alert(result.error);
+      }
     }
     setLoading(false);
+  };
+
+  const InputError = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 text-rose-500 animate-in fade-in slide-in-from-top-1 duration-200 text-left">
+        <AlertCircle className="h-3 w-3" />
+        <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+      </div>
+    );
   };
 
   const handleToggleStatus = async (id: string, currentStatus: string, reason?: string) => {
@@ -233,7 +272,7 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
                    <X className="h-5 w-5 text-slate-400" />
                  </button>
               </div>
-              <form onSubmit={handleUpdate} className="p-8 space-y-6">
+              <form onSubmit={handleUpdate} className="p-8 space-y-6" noValidate>
                  <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -250,20 +289,39 @@ export function CustomerList({ initialCustomers, userRole }: { initialCustomers:
                         </div>
                         <div>
                             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
-                            <input name="name" defaultValue={editingCustomer.name} required className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
+                            <input 
+                              name="name" 
+                              defaultValue={editingCustomer.name} 
+                              required 
+                              onChange={() => clearFieldError("name")}
+                              className={`w-full rounded-2xl border-2 px-5 py-3 text-sm focus:outline-none transition-all ${
+                                fieldErrors.name ? "border-rose-100 bg-rose-50 dark:bg-rose-900/10 focus:border-rose-500" : "border-transparent bg-slate-50 dark:bg-slate-800 dark:text-white focus:border-indigo-600"
+                              }`}
+                            />
+                            <InputError message={fieldErrors.name} />
                         </div>
                     </div>
                     <div>
                       <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
-                      <input name="email" type="email" defaultValue={editingCustomer.email} required className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
+                      <input 
+                        name="email" 
+                        type="email" 
+                        defaultValue={editingCustomer.email} 
+                        required 
+                        onChange={() => clearFieldError("email")}
+                        className={`w-full rounded-2xl border-2 px-5 py-3 text-sm focus:outline-none transition-all ${
+                          fieldErrors.email ? "border-rose-100 bg-rose-50 dark:bg-rose-900/10 focus:border-rose-500" : "border-transparent bg-slate-50 dark:bg-slate-800 dark:text-white focus:border-indigo-600"
+                        }`}
+                      />
+                      <InputError message={fieldErrors.email} />
                     </div>
                     <div>
                       <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
-                      <input name="phone" defaultValue={editingCustomer.phone || ""} placeholder="+1 234 567 890" className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
+                      <input name="phone" defaultValue={editingCustomer.phone || ""} placeholder="+1 234 567 890" className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none transition-all" />
                     </div>
                     <div>
                       <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Internal Notes</label>
-                      <textarea name="notes" rows={3} defaultValue={editingCustomer.notes || ""} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-3 text-sm dark:text-white outline-none resize-none" />
+                      <textarea name="notes" rows={3} defaultValue={editingCustomer.notes || ""} className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none resize-none transition-all" />
                     </div>
                  </div>
                  <button 

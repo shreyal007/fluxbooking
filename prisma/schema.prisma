@@ -117,6 +117,7 @@ model User {
   name          String?
   email         String    @unique
   password      String?
+  phone         String?
   emailVerified DateTime?
   image         String?
   role          UserRole  @default(STAFF)

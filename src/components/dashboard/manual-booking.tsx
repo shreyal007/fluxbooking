@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { getAvailableSlots, createBooking, updateBooking } from "@/app/actions/booking";
 import { searchCustomers, addCustomer } from "@/app/actions/customer";
+import { AlertCircle } from "lucide-react";
 
 export function ManualBooking({ 
   tenantId, 
@@ -29,6 +30,7 @@ export function ManualBooking({
   const [step, setStep] = useState(mode === "edit" ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   // Customer Search State
   const [customerSearch, setCustomerSearch] = useState("");
@@ -71,6 +73,24 @@ export function ManualBooking({
     return () => clearTimeout(delayDebounceFn);
   }, [customerSearch]);
 
+  const clearFieldError = (field: string) => {
+    if (fieldErrors[field]) {
+      const newErrors = { ...fieldErrors };
+      delete newErrors[field];
+      setFieldErrors(newErrors);
+    }
+  };
+
+  const InputError = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 text-rose-500 animate-in fade-in slide-in-from-top-1 duration-200 text-left">
+        <AlertCircle className="h-3 w-3" />
+        <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+      </div>
+    );
+  };
+
   const fetchSlots = async (date: Date, serviceId: string, staffId?: string) => {
     setLoading(true);
     const result = await getAvailableSlots(
@@ -98,15 +118,42 @@ export function ManualBooking({
     setIsAddingNewCustomer(false);
   };
 
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedSlot(null);
+    if (selectedService) {
+      fetchSlots(date, selectedService.id);
+    }
+  };
+
   const handleCreateNewCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
+
     const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+
+    const errors: Record<string, string> = {};
+    if (!name) errors.customerName = "Name is required";
+    if (!email) errors.customerEmail = "Email is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
+
     const result = await addCustomer(formData);
     if (result.success) {
       handleSelectCustomer(result.customer);
     } else {
-      alert(result.error);
+      if (result.error?.includes("email")) {
+        setFieldErrors({ customerEmail: "This email is already in use" });
+      } else {
+        alert(result.error);
+      }
     }
     setLoading(false);
   };
@@ -344,14 +391,35 @@ export function ManualBooking({
                         </button>
                       </div>
                     ) : isAddingNewCustomer ? (
-                      <form onSubmit={handleCreateNewCustomer} className="space-y-4 animate-fade-in">
+                      <form onSubmit={handleCreateNewCustomer} className="space-y-4 animate-fade-in" noValidate>
                         <div className="flex items-center justify-between">
                            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest">New Customer Details</h4>
                            <button type="button" onClick={() => setIsAddingNewCustomer(false)} className="text-[10px] font-bold text-indigo-600">Back to search</button>
                         </div>
-                        <input name="name" placeholder="Full Name" required className="w-full bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
-                        <input name="email" type="email" placeholder="Email Address" required className="w-full bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
-                        <input name="phone" placeholder="Phone Number (Optional)" className="w-full bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none" />
+                        <div>
+                          <input 
+                            name="name" 
+                            placeholder="Full Name" 
+                            required 
+                            className={`w-full bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none border-2 transition-all ${
+                              fieldErrors.customerName ? "border-rose-100 bg-rose-50" : "border-transparent focus:border-indigo-600"
+                            }`} 
+                          />
+                          <InputError message={fieldErrors.customerName} />
+                        </div>
+                        <div>
+                          <input 
+                            name="email" 
+                            type="email" 
+                            placeholder="Email Address" 
+                            required 
+                            className={`w-full bg-slate-50 dark:bg-slate-800 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none border-2 transition-all ${
+                              fieldErrors.customerEmail ? "border-rose-100 bg-rose-50" : "border-transparent focus:border-indigo-600"
+                            }`} 
+                          />
+                          <InputError message={fieldErrors.customerEmail} />
+                        </div>
+                        <input name="phone" placeholder="Phone Number (Optional)" className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-indigo-600 rounded-2xl px-5 py-3 text-sm dark:text-white outline-none transition-all" />
                         <button type="submit" disabled={loading} className="w-full py-3 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all">
                           {loading ? "Creating..." : "Create & Select Customer"}
                         </button>

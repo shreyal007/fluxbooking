@@ -25,30 +25,34 @@ export function TrialBanner({ planStatus, trialEndsAt }: TrialBannerProps) {
   if (planStatus !== "TRIALING" || daysRemaining === null) return null;
 
   return (
-    <div className={`w-full px-6 py-3 flex items-center justify-between transition-colors ${
+    <div className={`w-full px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-500 ${
       daysRemaining <= 3 
-      ? "bg-rose-500 text-white" 
-      : "bg-indigo-600 text-white"
+      ? "bg-rose-500 text-white shadow-lg shadow-rose-200" 
+      : "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
     }`}>
-      <div className="flex items-center gap-3">
-        {daysRemaining <= 3 ? (
-          <AlertCircle className="h-5 w-5 animate-pulse" />
-        ) : (
-          <Clock className="h-5 w-5" />
-        )}
-        <p className="text-sm font-bold">
-          {daysRemaining === 0 
-            ? "Your free trial ends today!" 
-            : `Your free trial ends in ${daysRemaining} day${daysRemaining === 1 ? "" : "s"}.`}
-          <span className="hidden md:inline ml-2 font-normal opacity-90">
-            Add a payment method to ensure your booking page stays online.
-          </span>
-        </p>
+      <div className="flex items-center gap-4">
+        <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner">
+          {daysRemaining <= 3 ? (
+            <AlertCircle className="h-5 w-5 animate-pulse" />
+          ) : (
+            <Clock className="h-5 w-5" />
+          )}
+        </div>
+        <div>
+           <p className="text-sm font-black tracking-tight leading-tight">
+             {daysRemaining === 0 
+               ? "Your Starter features trial ends today!" 
+               : `Free Trial Active: You're using Starter features for ${daysRemaining} more day${daysRemaining === 1 ? "" : "s"}.`}
+           </p>
+           <p className="text-[10px] font-bold opacity-80 mt-0.5 uppercase tracking-widest">
+             After the trial, you will revert to the 1-staff Free plan.
+           </p>
+        </div>
       </div>
       
       <Link 
         href="/dashboard/settings" 
-        className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full text-xs font-black transition-all backdrop-blur-sm"
+        className="flex items-center gap-2 bg-white text-indigo-600 hover:bg-slate-50 px-6 py-2 rounded-xl text-xs font-black transition-all shadow-xl active:scale-95"
       >
         Upgrade Now
         <ArrowRight className="h-3.5 w-3.5" />

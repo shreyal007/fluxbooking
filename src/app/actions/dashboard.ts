@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcrypt";
+import { COUNTRIES } from "@/config/countries";
 
 export async function addService(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -39,15 +41,75 @@ export async function addStaff(formData: FormData) {
   const tenantId = (session.user as any).tenantId;
   const name = formData.get("name") as string;
   const bio = formData.get("bio") as string;
-  const userId = formData.get("userId") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const phone = formData.get("phone") as string;
+  const countryCode = formData.get("staffCountryCode") as string;
+  const existingUserId = formData.get("userId") as string;
+
+  // Combine phone with country code
+  const selectedCountryData = COUNTRIES.find(c => c.code === countryCode);
+  const fullPhone = selectedCountryData && phone ? `+${selectedCountryData.phoneCode}${phone}` : phone;
 
   try {
+    // Check staff limit based on plan
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { plan: true, planStatus: true }
+    });
+
+    const staffCount = await prisma.staff.count({
+      where: { tenantId }
+    });
+
+    const limits = {
+      FREE: 1,
+      TEAM: 5,
+      PRO: 1000
+    };
+
+    let currentLimit = limits[tenant?.plan as keyof typeof limits] || 1;
+    if (tenant?.planStatus === "TRIALING" && currentLimit < 5) {
+      currentLimit = 5;
+    }
+
+    if (staffCount >= currentLimit) {
+      const planName = tenant?.planStatus === "TRIALING" ? "Free Trial" : `${tenant?.plan} plan`;
+      return { 
+        error: `Limit reached. Your ${planName} allows up to ${currentLimit} staff member(s). Please upgrade to add more.` 
+      };
+    }
+
+    let targetUserId = existingUserId || null;
+
+    // If email and password provided, create a new user account
+    if (!targetUserId && email && password) {
+      // Check if email already exists
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        return { error: "A user with this email already exists." };
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          phone: fullPhone || null,
+          role: "STAFF",
+          tenantId
+        }
+      });
+      targetUserId = newUser.id;
+    }
+
     await prisma.staff.create({
       data: {
         name,
         bio,
         tenantId,
-        userId: userId || null,
+        userId: targetUserId || null,
         availabilityJson: JSON.stringify({
           monday: { start: "09:00", end: "17:00" },
           tuesday: { start: "09:00", end: "17:00" },
@@ -60,6 +122,7 @@ export async function addStaff(formData: FormData) {
     revalidatePath("/dashboard/staff");
     return { success: true };
   } catch (error) {
+    console.error("Add Staff Error:", error);
     return { error: "Failed to add staff" };
   }
 }
@@ -92,7 +155,7 @@ export async function updateStaffAvailability(staffId: string, availability: any
     await prisma.staff.update({
       where: { 
         id: staffId,
-        tenantId // Security: Ensure staff belongs to this tenant
+        tenantId 
       },
       data: { 
         availabilityJson: JSON.stringify(availability),
@@ -124,7 +187,6 @@ export async function submitLeaveRequest(formData: FormData) {
 
   const isUrgent = type === "SICK" || type === "EMERGENCY";
 
-  // Validation: Notice Period (48 hours for Vacation/Personal)
   if (!isUrgent) {
     const minNotice = new Date();
     minNotice.setHours(minNotice.getHours() + 48);
@@ -135,7 +197,6 @@ export async function submitLeaveRequest(formData: FormData) {
   }
 
   try {
-    // Check for existing bookings to warn the admin later
     const result = await prisma.$transaction(async (tx) => {
       const request = await tx.leaveRequest.create({
         data: {
@@ -149,7 +210,6 @@ export async function submitLeaveRequest(formData: FormData) {
         }
       });
 
-      // If it's Urgent (Sick or Emergency), block the calendar immediately
       if (isUrgent) {
         await tx.blockedSlot.create({
           data: {
@@ -175,7 +235,7 @@ export async function submitLeaveRequest(formData: FormData) {
 
 export async function approveLeaveRequest(requestId: string) {
   const session = await getServerSession(authOptions);
-  if ((session?.user as any)?.role !== "ADMIN") return { error: "Unauthorized" };
+  if (!session || (session.user as any)?.role !== "ADMIN") return { error: "Unauthorized" };
 
   const tenantId = (session.user as any).tenantId;
 
@@ -186,7 +246,6 @@ export async function approveLeaveRequest(requestId: string) {
         data: { status: "APPROVED" }
       });
 
-      // Automatically create a BlockedSlot upon approval
       await tx.blockedSlot.create({
         data: {
           tenantId,
@@ -210,7 +269,7 @@ export async function approveLeaveRequest(requestId: string) {
 
 export async function rejectLeaveRequest(requestId: string) {
   const session = await getServerSession(authOptions);
-  if ((session?.user as any)?.role !== "ADMIN") return { error: "Unauthorized" };
+  if (!session || (session.user as any)?.role !== "ADMIN") return { error: "Unauthorized" };
 
   const tenantId = (session.user as any).tenantId;
 

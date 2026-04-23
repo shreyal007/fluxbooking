@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/request";
+import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots } from "@/app/actions/booking";
 
 export async function GET(req: Request) {

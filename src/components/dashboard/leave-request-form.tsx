@@ -6,14 +6,42 @@ import { Calendar, Clock, Send, AlertCircle } from "lucide-react";
 
 export function LeaveRequestForm() {
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const clearFieldError = (field: string) => {
+    if (fieldErrors[field]) {
+      const newErrors = { ...fieldErrors };
+      delete newErrors[field];
+      setFieldErrors(newErrors);
+    }
+    setMessage(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
     setMessage(null);
 
     const formData = new FormData(e.currentTarget);
+    const startTime = formData.get("startTime") as string;
+    const endTime = formData.get("endTime") as string;
+
+    const errors: Record<string, string> = {};
+    if (!startTime) errors.startTime = "Start time is required";
+    if (!endTime) errors.endTime = "End time is required";
+    
+    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
+      errors.endTime = "End time must be after start time";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
+
     const result = await submitLeaveRequest(formData);
 
     if (result.success) {
@@ -25,8 +53,18 @@ export function LeaveRequestForm() {
     setLoading(false);
   };
 
+  const InputError = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center gap-1.5 mt-1.5 text-rose-500 animate-in fade-in slide-in-from-top-1 duration-200">
+        <AlertCircle className="h-3 w-3" />
+        <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+      </div>
+    );
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 transition-colors">
+    <form onSubmit={handleSubmit} className="space-y-4 transition-colors" noValidate>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Leave Type</label>
@@ -59,8 +97,12 @@ export function LeaveRequestForm() {
             name="startTime" 
             type="datetime-local" 
             required
-            className="w-full rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            onChange={() => clearFieldError("startTime")}
+            className={`w-full rounded-xl border-2 px-4 py-2 text-sm focus:outline-none transition-all ${
+              fieldErrors.startTime ? "border-rose-100 bg-rose-50 dark:bg-rose-900/10 focus:border-rose-500" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-indigo-500"
+            }`}
           />
+          <InputError message={fieldErrors.startTime} />
         </div>
         <div>
           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">End Time</label>
@@ -68,8 +110,12 @@ export function LeaveRequestForm() {
             name="endTime" 
             type="datetime-local" 
             required
-            className="w-full rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+            onChange={() => clearFieldError("endTime")}
+            className={`w-full rounded-xl border-2 px-4 py-2 text-sm focus:outline-none transition-all ${
+              fieldErrors.endTime ? "border-rose-100 bg-rose-50 dark:bg-rose-900/10 focus:border-rose-500" : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-indigo-500"
+            }`}
           />
+          <InputError message={fieldErrors.endTime} />
         </div>
       </div>
 

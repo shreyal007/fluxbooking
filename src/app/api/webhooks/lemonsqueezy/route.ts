@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
+import { SubscriptionPlan, SubscriptionInterval } from "@prisma/client";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -36,19 +37,44 @@ export async function POST(req: Request) {
       const status = attributes.status; // active, trialing, past_due, etc.
       
       // Map variant ID to internal plan ID
-      let planId = "STARTER";
-      if (variantId === process.env.NEXT_PUBLIC_LS_VARIANT_PRO) {
+      let planId: SubscriptionPlan = "PRO"; // Default
+      let interval: SubscriptionInterval = "MONTH";
+
+      if (variantId === process.env.NEXT_PUBLIC_LS_VARIANT_PRO_YEARLY) {
         planId = "PRO";
+        interval = "YEAR";
+      } else if (variantId === process.env.NEXT_PUBLIC_LS_VARIANT_PRO_MONTHLY) {
+        planId = "PRO";
+        interval = "MONTH";
+      } else if (variantId === process.env.NEXT_PUBLIC_LS_VARIANT_STARTER_YEARLY) {
+        planId = "TEAM"; // Map Starter to TEAM in Prisma
+        interval = "YEAR";
+      } else if (variantId === process.env.NEXT_PUBLIC_LS_VARIANT_STARTER_MONTHLY) {
+        planId = "TEAM";
+        interval = "MONTH";
       }
 
-      console.log(`✅ Updating Subscription: Tenant ${tenantId} -> Plan ${planId} (${status})`);
+      console.log(`✅ Updating Subscription: Tenant ${tenantId} -> Plan ${planId} (${interval}) Status: ${status}`);
       
       await prisma.tenant.update({
         where: { id: tenantId },
         data: {
           planStatus: status.toUpperCase(),
           plan: planId,
+          planInterval: interval,
           subscriptionEndsAt: attributes.renews_at ? new Date(attributes.renews_at) : null,
+        },
+      });
+    } else if (eventName === "subscription_cancelled" || eventName === "subscription_expired") {
+      // REVERT TO FREE PLAN
+      console.log(`📉 Subscription Ended: Reverting Tenant ${tenantId} to FREE plan`);
+      
+      await prisma.tenant.update({
+        where: { id: tenantId },
+        data: {
+          planStatus: "CANCELLED",
+          plan: "FREE",
+          planInterval: "MONTH",
         },
       });
     } else if (eventName === "order_created" && type === "SMS") {
