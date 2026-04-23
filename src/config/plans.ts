@@ -5,6 +5,7 @@ export const PLANS = [
     description: "Perfect for solopreneurs starting out.",
     price: {
       amount: 0,
+      variantId: "", 
       priceIds: {
         test: "",
         production: "",
@@ -18,13 +19,14 @@ export const PLANS = [
     ],
   },
   {
-    id: "GROWTH",
-    name: "Growth",
-    description: "Ideal for small teams and growing shops.",
+    id: "STARTER",
+    name: "Starter",
+    description: "Ideal for growing stylists and small teams.",
     price: {
       amount: 6.99,
+      variantId: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER || "price_placeholder_growth_monthly", 
       priceIds: {
-        test: "price_placeholder_growth_monthly",
+        test: process.env.NEXT_PUBLIC_LS_VARIANT_STARTER || "price_placeholder_growth_monthly",
         production: "",
       },
     },
@@ -37,13 +39,14 @@ export const PLANS = [
     ],
   },
   {
-    id: "UNLIMITED",
-    name: "Unlimited",
-    description: "Scale your business without limits.",
+    id: "PRO",
+    name: "Pro",
+    description: "The complete toolkit for full salons and gyms.",
     price: {
       amount: 14.99,
+      variantId: process.env.NEXT_PUBLIC_LS_VARIANT_PRO || "price_placeholder_unlimited_monthly",
       priceIds: {
-        test: "price_placeholder_unlimited_monthly",
+        test: process.env.NEXT_PUBLIC_LS_VARIANT_PRO || "price_placeholder_unlimited_monthly",
         production: "",
       },
     },
@@ -63,20 +66,23 @@ export const SMS_PACKS = [
     name: "Starter Pack",
     credits: 200,
     price: 12,
-    priceId: "price_placeholder_sms_200",
+    variantId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_200 || "price_placeholder_sms_200",
+    priceId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_200 || "price_placeholder_sms_200",
   },
   {
     id: "SMS_STANDARD",
     name: "Standard Pack",
     credits: 1000,
     price: 45,
-    priceId: "price_placeholder_sms_1000",
+    variantId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_1000 || "price_placeholder_sms_1000",
+    priceId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_1000 || "price_placeholder_sms_1000",
   },
   {
     id: "SMS_BUSINESS",
     name: "Business Pack",
     credits: 2500,
     price: 99,
-    priceId: "price_placeholder_sms_2500",
+    variantId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_2500 || "price_placeholder_sms_2500",
+    priceId: process.env.NEXT_PUBLIC_LS_VARIANT_SMS_2500 || "price_placeholder_sms_2500",
   },
 ];

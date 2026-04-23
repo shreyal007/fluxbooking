@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check, CreditCard, Sparkles, Zap, MessageSquare, ShoppingCart } from "lucide-react";
 import { PLANS, SMS_PACKS } from "@/config/plans";
-import { createCheckoutSession, createSMSPurchaseSession } from "@/app/actions/stripe";
+import { createLemonSqueezyCheckout } from "@/app/actions/lemonsqueezy";
 
 export function BillingSettings({ 
   currentPlan, 
@@ -19,8 +19,15 @@ export function BillingSettings({
 
   const handleUpgrade = async (planId: string) => {
     setLoading(planId);
-    const result = await createCheckoutSession(planId, interval);
-    
+    const plan = PLANS.find(p => p.id === planId);
+    if (!plan || !plan.price.variantId) {
+       alert("Plan configuration error");
+       setLoading(null);
+       return;
+    }
+
+    const result = await createLemonSqueezyCheckout(plan.price.variantId, "SUBSCRIPTION");
+
     if (result.url) {
       window.location.href = result.url;
     } else if (result.error) {
@@ -31,8 +38,15 @@ export function BillingSettings({
 
   const handleBuySMS = async (packId: string) => {
     setLoading(packId);
-    const result = await createSMSPurchaseSession(packId);
-    
+    const pack = SMS_PACKS.find(p => p.id === packId);
+    if (!pack || !pack.variantId) {
+      alert("Pack configuration error");
+      setLoading(null);
+      return;
+    }
+
+    const result = await createLemonSqueezyCheckout(pack.variantId, "SMS");
+
     if (result.url) {
       window.location.href = result.url;
     } else if (result.error) {
@@ -40,7 +54,6 @@ export function BillingSettings({
       setLoading(null);
     }
   };
-
   return (
     <div className="space-y-6">
       {/* Subscription Plans */}

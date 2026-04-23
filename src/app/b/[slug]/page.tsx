@@ -23,6 +23,34 @@ export default async function PublicBookingPage({
     notFound();
   }
 
+  // Check for trial expiration
+  const now = new Date();
+  const isTrialExpired = 
+    tenant.planStatus === "TRIALING" && 
+    tenant.trialEndsAt && 
+    tenant.trialEndsAt < now;
+  
+  const isPastDue = tenant.planStatus === "PAST_DUE";
+
+  if (isTrialExpired || isPastDue) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-12 rounded-[2.5rem] shadow-xl border border-slate-100 max-w-md w-full">
+          <div className="h-20 w-20 bg-amber-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+            <Calendar className="h-10 w-10 text-amber-500" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-4">Temporarily Offline</h2>
+          <p className="text-slate-500 font-medium leading-relaxed">
+            {tenant.name} is currently updating their booking system. Please check back later or contact them directly.
+          </p>
+          <div className="mt-8 pt-8 border-t border-slate-50">
+             <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Service by FluxBooking</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8 selection:bg-indigo-100 relative overflow-hidden">
       {/* Background Decorative Glows */}
