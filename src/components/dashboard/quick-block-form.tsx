@@ -6,22 +6,54 @@ import { Clock, Ban, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
+function InputError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 text-rose-500 animate-in fade-in slide-in-from-top-1 duration-200 text-left">
+      <AlertCircle className="h-3 w-3" />
+      <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+    </div>
+  );
+}
+
 export function QuickBlockForm({ staffId, existingBlocks }: { staffId: string, existingBlocks: any[] }) {
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const clearFieldError = (field: string) => {
+    if (fieldErrors[field]) {
+      const newErrors = { ...fieldErrors };
+      delete newErrors[field];
+      setFieldErrors(newErrors);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     const formData = new FormData(e.currentTarget);
     formData.append("staffId", staffId);
 
-    const start = new Date(formData.get("startTime") as string);
-    const end = new Date(formData.get("endTime") as string);
+    const startTimeStr = formData.get("startTime") as string;
+    const endTimeStr = formData.get("endTime") as string;
 
-    if (start >= end) {
-      toast.error("End time must be after start time");
+    const errors: Record<string, string> = {};
+    if (!startTimeStr) errors.startTime = "Start time is required";
+    if (!endTimeStr) errors.endTime = "End time is required";
+
+    if (startTimeStr && endTimeStr) {
+      const start = new Date(startTimeStr);
+      const end = new Date(endTimeStr);
+      if (start >= end) {
+        errors.endTime = "End time must be after start time";
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       setLoading(false);
       return;
     }
@@ -51,7 +83,7 @@ export function QuickBlockForm({ staffId, existingBlocks }: { staffId: string, e
   return (
     <div className="space-y-8">
       {/* Block Form */}
-      <form onSubmit={handleSubmit} className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-4" noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Block Reason</label>
@@ -65,18 +97,30 @@ export function QuickBlockForm({ staffId, existingBlocks }: { staffId: string, e
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Duration</label>
             <div className="grid grid-cols-2 gap-2">
-              <input
-                name="startTime"
-                type="datetime-local"
-                required
-                className="w-full rounded-2xl border-2 border-white dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2.5 text-xs focus:outline-none focus:border-indigo-600 transition-all dark:text-white"
-              />
-              <input
-                name="endTime"
-                type="datetime-local"
-                required
-                className="w-full rounded-2xl border-2 border-white dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2.5 text-xs focus:outline-none focus:border-indigo-600 transition-all dark:text-white"
-              />
+              <div className="space-y-1">
+                <input
+                  name="startTime"
+                  type="datetime-local"
+                  required
+                  onChange={() => clearFieldError("startTime")}
+                  className={`w-full rounded-2xl border-2 bg-white dark:bg-slate-900 px-3 py-2.5 text-xs focus:outline-none transition-all dark:text-white ${
+                    fieldErrors.startTime ? "border-rose-100 focus:border-rose-500" : "border-white dark:border-slate-800 focus:border-indigo-600"
+                  }`}
+                />
+                <InputError message={fieldErrors.startTime} />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="endTime"
+                  type="datetime-local"
+                  required
+                  onChange={() => clearFieldError("endTime")}
+                  className={`w-full rounded-2xl border-2 bg-white dark:bg-slate-900 px-3 py-2.5 text-xs focus:outline-none transition-all dark:text-white ${
+                    fieldErrors.endTime ? "border-rose-100 focus:border-rose-500" : "border-white dark:border-slate-800 focus:border-indigo-600"
+                  }`}
+                />
+                <InputError message={fieldErrors.endTime} />
+              </div>
             </div>
           </div>
         </div>

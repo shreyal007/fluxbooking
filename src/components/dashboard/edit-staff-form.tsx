@@ -66,6 +66,16 @@ export function EditStaffForm({ staff, isAdmin, onSuccess, services }: EditStaff
     setGeneralError(null);
 
     const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+
+    const errors: Record<string, string> = {};
+    if (isAdmin && !name) errors.name = "Staff name is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
     
     // Append selected services
     selectedServices.forEach(id => formData.append("services", id));

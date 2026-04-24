@@ -380,15 +380,15 @@ function RegisterContent() {
                       dropdownDirection === "up" ? "bottom-full mb-2" : "top-full mt-2"
                     }`}>
                       {[
-                        { id: "SALON", label: "Salon / Spa" },
-                        { id: "GYM", label: "Gym / Fitness" },
-                        { id: "CLINIC", label: "Healthcare & Wellness" },
+                        { id: "SALON", label: "Salon & Beauty" },
+                        { id: "GYM", label: "Fitness & Gym" },
+                        { id: "CLINIC", label: "Medical & Health" },
                       ].map((type) => (
                         <button
                           key={type.id}
                           type="button"
                           onClick={() => { setSelectedBusinessType(type.id); setOpenDropdown(null); clearFieldError("businessType"); }}
-                          className={`flex items-center w-full px-5 py-3 text-sm font-bold transition-colors ${
+                          className={`flex items-center w-full px-5 py-3 text-sm font-bold transition-colors text-left ${
                             selectedBusinessType === type.id ? "bg-indigo-50 text-indigo-600" : "text-slate-700 hover:bg-slate-50"
                           }`}
                         >
